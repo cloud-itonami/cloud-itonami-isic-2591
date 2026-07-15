@@ -1,0 +1,38 @@
+{:itonami.blueprint/id "cloud-itonami-isic-2591"
+ :itonami.blueprint/name "Forging, pressing, stamping and roll-forming of metal; powder metallurgy"
+ :itonami.blueprint/isic-rev5 "2591"
+ :itonami.blueprint/domain :metal-forming/manufacturing
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:worker-safety :materials-safety :resource-efficiency]
+ :itonami.blueprint/governor :metal-forming-plant-operations-governor
+ :itonami.blueprint/robotics true
+ :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger :cae]
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "MetalFormingAdvisor ⊣ Metal Forming Plant Operations Governor,
+ langgraph-clj StateGraph, append-only audit ledger. A plant
+ OPERATIONS COORDINATION actor for a forging/pressing/stamping/
+ roll-forming and powder-metallurgy job shop (forging press ->
+ stamping press -> roll-forming mill -> powder-metallurgy press-and-
+ sinter line) turning metal stock (billets, blanks, coil, metal
+ powder) into near-net-shape forged/pressed/stamped/roll-formed/
+ sintered parts, typically as a subcontractor for downstream
+ manufacturers -- not direct forging/pressing-line-equipment control
+ authority. Four ops (`:log-production-batch` / `:schedule-
+ maintenance` / `:flag-safety-concern` / `:coordinate-shipment`), all
+ `:effect :propose` only. Ten concrete governor checks elaborate this
+ blueprint's four HARD invariants: propose-only effect, closed op
+ allowlist, closed proposal-effect allowlist (no direct forging/
+ pressing-line-equipment control), permanent forge/press-line-actuate
+ block, independent equipment verification/registration before
+ maintenance scheduling, independent batch verification/registration
+ before shipment coordination, independent shipment-weight recompute
+ against the batch's own logged weight, double-schedule guard,
+ product-category validation, and defect-rate plausibility validation.
+ Safety-concern flagging (forging-press/stamping-press pinch-crush
+ hazard, high-temperature-forging burn/radiant-heat exposure, roll-
+ forming-mill entanglement hazard, powder-metallurgy combustible-
+ metal-dust/inhalation exposure) ALWAYS escalates to a human plant
+ supervisor; `:log-production-batch` is the only op eligible to
+ auto-commit, and only at phase 3 when governor-clean."}
