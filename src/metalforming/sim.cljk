@@ -1,5 +1,5 @@
 (ns metalforming.sim
-  "Demo driver -- `clojure -M:dev:run`. Walks a clean forging/pressing/
+  "Demo driver -- `kbb -M:dev:run`. Walks a clean forging/pressing/
   stamping/roll-forming and powder-metallurgy plant through intake ->
   maintenance scheduling (escalate/approve) -> safety-concern flag
   (escalate/approve) -> shipment coordination (escalate/approve), then
