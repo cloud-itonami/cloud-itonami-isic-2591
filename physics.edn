@@ -1,0 +1,44 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; The README has no "Robotics premise" section; its Scope names the shop
+;; this actor coordinates (ISIC 2591): forging, pressing, stamping,
+;; roll-forming and powder-sintering billets, blanks, coil and powder into
+;; near-net-shape parts. The physical work of that shop taken here: soaking
+;; a steel billet through to forging temperature in the furnace, the
+;; forging manipulator carrying the hot billet to the press die, and the
+;; tensile check of a coupon from each incoming coil before stamping.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-2591"
+ :cases
+ [{:id :billet-soak
+   :kind :thermal
+   :procedure "steel billet in the 1250 C gas-fired furnace (radiation lumped into the surface coefficient), charged cold: time for its centre (half the section, centre adiabatic) to reach 1150 C forging temperature"
+   :params {:thickness-m 0.05 :conductivity-w-mk 30.0 :density-kg-m3 7850.0 :specific-heat-j-kgk 650.0
+            :t0-c 20.0 :t-hot-c 1250.0 :h-front-w-m2k 150.0 :h-back-w-m2k 0.0
+            :threshold-c 1150.0 :duration-s 21600.0 :nodes 11}
+   :sweep {:param :thickness-m :values [0.025 0.04 0.05 0.075 0.10]}
+   :quantity :time-to-threshold-s
+   :limit {:max 3600.0 :basis "estimate: one hour of furnace residence per billet at the press's forging rate"}
+   :boundary {:lo 0.01 :hi 0.2}}
+  {:id :hot-billet-to-die
+   :kind :manipulator
+   :procedure "forging manipulator carries the hot billet from the furnace door to the lower die of the press"
+   :params {:l1-m 0.90 :l2-m 0.80 :m1-kg 25.0 :m2-kg 18.0
+            :from [1.10 0.60] :to [0.60 0.10] :duration-s 2.5 :steps 500}
+   :sweep {:param :payload-kg :values [10.0 20.0 40.0 60.0 80.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 1500.0 :basis "estimate: continuous shoulder torque of a ~100 kg-payload forging-handling arm class"}
+   :boundary {:lo 1.0 :hi 250.0}}
+  {:id :coil-coupon
+   :kind :material
+   :procedure "QC robot pulls a 2 mm x 20 mm coupon (100 mm gauge) cut from an incoming cold-rolled coil to 20 kN before it is released to the stamping press; the 0.2 % offset yield force is judged; sweep = the coil's yield stress"
+   :params {:length-m 0.10 :area-m2 4.0e-5 :youngs-modulus-pa 205.0e9 :hardening-pa 1.0e9
+            :density-kg-m3 7850.0 :max-force-n 20000.0}
+   :sweep {:param :yield-stress-pa :values [240.0e6 270.0e6 300.0e6 330.0e6 380.0e6]}
+   :quantity :yield-force-n
+   :limit {:max 13200.0 :basis "estimate: the die was tried out on coil up to 330 MPa yield; stronger coil springs back out of tolerance (330 x 40 mm2 = 13200 N)"}
+   :boundary {:lo 200.0e6 :hi 420.0e6}}]}
