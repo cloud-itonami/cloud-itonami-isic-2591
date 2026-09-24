@@ -4,7 +4,7 @@
   (HARD holds, escalation, phase gating) is exercised in
   `metalforming.governor-contract-test`; the Store contract in
   `metalforming.store-contract-test`."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [langgraph.graph :as g]
             [metalforming.operation :as op]
             [metalforming.store :as store]))
